@@ -10,8 +10,8 @@ pygmentsUseClasses=true
 pygmentsCodeFences=true
 
 [params.intro]
-  main = "Hi, I'm Edna :wave:"
-  sub = "I'm a Web Developer and Entrepreneur"
+  main = "Hi, I'm Joseph Pope :wave:"
+  sub = "I'm a Data Scientist"
 
 [params.main]
   latestPublishHeader = "My Latest Project"
@@ -48,16 +48,10 @@ pygmentsCodeFences=true
   customCSS = ""
 
 [params.social]
-  github = "https://github.com/"
-  twitter = "https://twitter.com/"
-  linkedin = "https://www.linkedin.com/in/"
+  github = "https://github.com/joepope44"
+  twitter = "https://twitter.com/joepope44"
+  linkedin = "https://www.linkedin.com/in/joepope44"
   medium = "https://medium.com/"
-  codepen = "https://codepen.io/"
-  facebook = "https://www.facebook.com/"
-  youtube = "https://www.youtube.com/"
-  instagram = "https://www.instagram.com/"
-  gitlab = "https://gitlab.com/"
-  keybase = "https://keybase.io/"
 
 [params.contact]
   email = "joepope44@gmail.com"

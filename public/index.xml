@@ -7,10 +7,22 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>© Joseph Pope</copyright>
-    <lastBuildDate>Fri, 03 May 2019 09:37:55 +0200</lastBuildDate>
+    <lastBuildDate>Mon, 06 Jul 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>joe_test_post</title>
+      <link>/post/joe-test-post/</link>
+      <pubDate>Mon, 06 Jul 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/post/joe-test-post/</guid>
+      <description> Tweet Shortcode Test, With Chunk Anyone know of an R package for interfacing with Alexa Skills? @thosjleeper @xieyihui @drob @JennyBryan @HoloMarkeD ?
+&amp;mdash; Jeff Leek (@jtleek) April 12, 2017   Tweet Shortcode Test, No Chunk {{&amp;lt; tweet 852205086956818432 &amp;gt;}}
+ Test GIF  Test R Code ![](https://media.giphy.com/media/xUOxf7XfmpxuSode1O/giphy.gif)  Insert Image with Add-In NBA
+  </description>
+    </item>
     
     <item>
       <title>Getting started</title>

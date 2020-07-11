@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>TidyTuesday on Joseph Pope</title>
+    <link>/categories/tidytuesday/</link>
+    <description>Recent content in TidyTuesday on Joseph Pope</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>© Joseph Pope</copyright>
+    <lastBuildDate>Tue, 07 Jul 2020 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="/categories/tidytuesday/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Coffee Ratings</title>
+      <link>/post/coffee-ratings/</link>
+      <pubDate>Tue, 07 Jul 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/post/coffee-ratings/</guid>
+      <description>Intro Today I am going to explore Coffee Ratings for this week’s Tidy Tuesday challenge.
+library(tidytuesdayR) library(tidyverse) ## ── Attaching packages ──────────────────────── tidyverse 1.3.0 ── ## ✓ ggplot2 3.3.2 ✓ purrr 0.3.4 ## ✓ tibble 3.0.1 ✓ dplyr 1.0.0 ## ✓ tidyr 1.1.0 ✓ stringr 1.4.0 ## ✓ readr 1.3.1 ✓ forcats 0.5.0 ## ── Conflicts ─────────────────────────── tidyverse_conflicts() ── ## x dplyr::filter() masks stats::filter() ## x dplyr::lag() masks stats::lag() library(tidymodels) ## ── Attaching packages ─────────────────────── tidymodels 0.</description>
+    </item>
+    
+  </channel>
+</rss>

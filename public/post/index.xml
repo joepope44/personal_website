@@ -7,10 +7,23 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>© Joseph Pope</copyright>
-    <lastBuildDate>Mon, 06 Jul 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Tue, 07 Jul 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/post/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Coffee Ratings</title>
+      <link>/post/coffee-ratings/</link>
+      <pubDate>Tue, 07 Jul 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/post/coffee-ratings/</guid>
+      <description>
+
+
+&lt;p&gt;A TidyTuesday project modelling coffee ratings predictions
+</description>
+    </item>
     
     <item>
       <title>joe_test_post</title>

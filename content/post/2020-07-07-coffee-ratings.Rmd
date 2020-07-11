@@ -152,7 +152,7 @@ coffee_test <- testing(coffee_split)
 ```
 
 Naive model with no scaling or pre-processing 
-```{r}
+```{r linear model engine}
 lm_spec <- linear_reg() %>%
   set_engine(engine = "lm")
 
@@ -169,7 +169,7 @@ lm_fit
 ```
 
 
-```{r}
+```{r random forest engine}
 library(ranger)
 
 rf_spec <- rand_forest(mode = "regression") %>%
@@ -193,7 +193,7 @@ Both models produce a hefty R squared, > .7! This makes me nervous as it's likel
 
 1) Let's create a bland, vanilla recipe to start off 
 
-```{r}
+```{r receipe object}
 
 rec_obj <- recipe(cupper_points ~ ., data = coffee_train) %>% 
   update_role(id, new_role = "ID") %>% 
@@ -204,11 +204,11 @@ summary(rec_obj)
 
 ```
 
-I tell the recipe not to use the "id" column in the analysis. I run summary on the recipe object and can see the type of role the variables have, as well as the type. I saw 'nominal' for the factor variables (species, country, variety) and got spooked a little, as I thought nominal == numeric. Of course, it does not. Nominal is yet another term to describe a factor/string/non-numeric. 
+I tell the recipe not to use the "id" column in the analysis and we can see that it is classified as a "ID" and not "predictor". I run summary on the recipe object and can see the type of role the variables have, as well as the type. I saw 'nominal' for the factor variables (species, country, variety) and got spooked a little, as I thought nominal == numeric. Of course, it does not. Nominal is yet another term to describe a factor/string/non-numeric. 
 
 Then I use the step_* functions to normalize the data (centers and scales numerical features) and create dummy variables for all of my nominal (non-numeric) features. 
 
-So we built our recipe. Next step is to prep and juice. I'm getting hungry.  
+So we built our recipe. Next step is to prep and juice. I'm getting thirsty.  
 
 ```{r juice}
 
@@ -231,27 +231,25 @@ coff_test <- rec_obj %>%
 
 ```
 
-
-
 So now we see all our predictors including all the dummy variables that were generated. Neat.  
 
 # Better, Faster, Stronger
 
 Now we can go back to the linear and random forest regression models used earlier, but now substitute the data with better processing. I think I see why they went with the "recipe" motif! Like baking, I can swap in ingredients without having to start over from scratch.  
 
-```{r}
-lm_fit1 <- fit(lm_spec, cupper_points ~ ., coff_j)
+```{r better version of linear model}
+lm_fit1 <- fit(lm_spec, cupper_points ~ ., coff_train)
 glance(lm_fit1$fit)
 ```
 
-```{r}
+```{r lm statistic}
 tidy(lm_fit1) %>% 
   arrange(desc(abs(statistic)))
 ```
 
 
 ```{r}
-lm_predicted <- augment(lm_fit1$fit, data = coff_j) 
+lm_predicted <- augment(lm_fit1$fit, data = coff_train) 
 select(lm_predicted, id, cupper_points, .fitted:.std.resid)
 ```
 
@@ -275,7 +273,7 @@ filter(coffee, id == 963)
 Now let's repeat for the random forest model. Note - `glance` does not work for ranger objects like rf_fit1$fit. 
 
 ```{r random_forest take2}
-rf_fit1 <- fit(rf_spec, cupper_points ~ ., coff_j)
+rf_fit1 <- fit(rf_spec, cupper_points ~ ., coff_train)
 rf_fit1$fit
 ```
 
@@ -283,15 +281,15 @@ rf_fit1$fit
 
 ```{r}
 results_train <- lm_fit1 %>%
-  predict(new_data = coff_j) %>%
+  predict(new_data = coff_train) %>%
   mutate(
-    truth = coff_j$cupper_points,
+    truth = coff_train$cupper_points,
     model = "lm"
   ) %>% 
 bind_rows(rf_fit1 %>%
-    predict(new_data = coff_j) %>%
+    predict(new_data = coff_train) %>%
     mutate(
-      truth = coff_j$cupper_points,
+      truth = coff_train$cupper_points,
       model = "rf"
     ))
 ```
@@ -302,12 +300,25 @@ results_train %>%
   rmse(truth = truth, estimate = .pred)
 ```
 
+Apply model to the test set
 ```{r}
 
 lm_fit1 %>%
   predict(coff_test) %>%
   bind_cols(coff_test) %>%
-  metrics(truth = cupper_points, estimate = .pred)
+  metrics(truth = cupper_points,
+          estimate = .pred) %>%
+  bind_cols(model = "lm") %>% 
+  bind_rows(
+    rf_fit1 %>%
+      predict(coff_test) %>%
+      bind_cols(coff_test) %>%
+      metrics(truth = cupper_points,
+        estimate = .pred
+      ) %>% 
+  bind_cols(model = "rf")
+  )
+
 
 ```
 

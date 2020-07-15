@@ -16,9 +16,9 @@ A TidyTuesday project modelling coffee ratings predictions
 
 Today I am going to explore Coffee Ratings for this week's Tidy Tuesday challenge. The data comes from the [Coffee Quality Database](https://github.com/jldbc/coffee-quality-database). The great thing about Tidy Tuesday is that we can do whatever we want with the data. There are no rules or directions! 
 
-This data is very interesting and looks ripe for a predictive model. I can use the ratings provided to predict either a quantitative method, like what the 'total_cup_score' (Overall rating) is, or a qualitative measure, like what species of bean (Arabica or Robusta) or the country of origin. 
+This data is very interesting with many features and looks ripe for a predictive model. I can use the various ratings provided to predict either a quantitative method, like what the 'total_cup_score' (Overall rating) is, or a qualitative measure, like what species of bean (Arabica or Robusta) or perhaps the country of origin. 
 
-Predicting scores strikes me as a classic regression problem, best tackled by linear models or random forests, and classification could be solved with logistic regression, Naive Bayes, SVM or even neural networks. I've NEVER used `tidymodels` before, so let's give it a go and see what we can learn. 
+Predicting scores strikes me as a classic regression problem, best tackled by linear models or random forests, and classification could be solved with logistic regression, Naive Bayes, SVM or even neural networks. I've NEVER used `tidymodels` before, so let's give it a go, make some mistakes, and see what we can learn. 
 
 But first, some brief background of our data from the TidyTuesday repo: 
 
@@ -63,15 +63,14 @@ coffee_ratings %>%
 
 # Check Initial Assumptions 
 
-I originally wanted to predict "total_cup_points". However, after some review it appears that this field is simply the sum of ten other ratings, from aroma to cupper_points. What I really want to predict is Cupper Points. This is the reviewer's (aka the Cupper's) final overall rating for the cup of joe. I can use this as dependant variable in a regression analysis. This should help me identify which features (aroma, acidity, elevation, country of origin?) influence the final rating the most. 
+I originally wanted to predict "total_cup_points". However, after some review it appears that this field is simply the sum of ten other ratings, from aroma to cupper_points. What I really want to predict is Cupper Points. This is the reviewer's (aka the Cupper's) personal overall rating for the cup of joe. I can use this as dependant variable in a regression analysis. This should help me identify which features (aroma, acidity, elevation, country of origin?) influence the final rating the most. 
 
 # Potential Features
 
-Before we dig further into the data, let's speculate what might factors go into a superior coffee bean. If coffee is like wine, then perhaps region (lat, long, altitude, preciptation, average hours of sunlight, etc) makes a big difference. Perhaps certain companies utilize best practices and farming techniques. Maybe certain processing methods are better than others. We are given the testing date and the expiration date, so we can add a feature that measures how fresh the beans are. These features and more could be really importnat or totally useless. I have no idea! Let's see what the data has to say about it.  
+Before we dig further into the data, let's speculate what might factors go into a superior coffee bean. If coffee is like wine, then perhaps region (lat, long, altitude, preciptation, average hours of sunlight, etc) makes a big difference. Perhaps certain companies utilize best practices and farming techniques. Maybe certain processing methods are better than others. We are given the testing date and the expiration date, so we can add a feature that measures how fresh the beans are. These features and more could be really important or totally useless. I have no idea! Let's see what the data has to say about it.  
 
 The wiki in the readme suggests that coffee beans are split 60/40 worldwide, by Arabica and Robusta. However, for this analysis the split is much more imbalanced. I thought it would be very interesting to build an Arabica vs. Robusta classifier but with such an imbalanced set I don't think upsampling or other methods will be enough to build a robust model. 
 
-OR WILL IT???? 
 ```{r species}
 table(coffee_ratings$species)
 ```
@@ -120,9 +119,9 @@ coffee_ratings %>%
 
 I have never used tidymodels, so let's see how this goes. Let's try to tackle the regression model first. From the skim package, we know we have no missing values or junky data for this. Nice! 
 
-First thing to do is narrow our data and make it ripe for modeling. TidyTuesday mentions that Yorgos Askalidis already determined that altitude, processing_method and color have no bearing to the cupping score, and I think that makes sense. I will omit those features for now. That leaves us with species, country of origin and several ratings and measurements of the coffee samples. I am going to take the top ten countries only (out of 36 in the data) and lump the rest into "Other" with forcats. 
+First thing to do is narrow our data and make it ripe for modeling. TidyTuesday mentions that Yorgos Askalidis already determined that altitude, processing_method and color have no bearing to the cupping score, and I think that makes sense. I will omit those features for now. That leaves us with species, country of origin and several ratings and measurements of the coffee samples. I am going to take the top ten countries only (out of 36 in the data) and lump the rest into "Other" with forcats. This is simply to speed up the processing without losing too much information gain for the feature. 
 
-I went back after trying the models a few times and removed 'species'. In this smaller, filtered dataset there are only 3 records with Robusta coffee beans. It caused me some issues, and with only 3 members of the minority class, I decided to just remove it completely. 
+> Note - I went back after trying the models a few times and removed 'species'. In this smaller, filtered dataset there are only 3 records with Robusta coffee beans. It caused me some issues, and with only 3 members of the minority class, I decided to just remove it completely.
 
 ```{r first pass of processing}
 
@@ -140,7 +139,8 @@ coffee <- coffee_ratings %>%
 
 Split the data 
 
-I am stratifying by species, even though there aren't many Robusta coffee samples in the data. This at least places the same ratio in train and test data sets. 
+> Note - I initially tried to stratify by species, even though there aren't many Robusta coffee samples in the data. I ended up removing this due to the severe class imbalance. It may have been worth the effort to upsample Robusta and then stratify by species. 
+
 ```{r split train and test data}
 set.seed(1234)
 
@@ -151,7 +151,7 @@ coffee_train <- training(coffee_split)
 coffee_test <- testing(coffee_split)
 ```
 
-Naive model with no scaling or pre-processing 
+Naive linear model with no scaling or pre-processing 
 ```{r linear model engine}
 lm_spec <- linear_reg() %>%
   set_engine(engine = "lm")
@@ -187,7 +187,7 @@ rf_fit <- rf_spec %>%
 rf_fit
 ```
 
-Both models produce a hefty R squared, > .7! This makes me nervous as it's likely too good to be true. I know that I skipped some preprocessing steps just to see how these models worked, so let's go back and see if some `recipes` can bring my model back down to earth. 
+Both models produce a hefty R squared, > .7! This makes me nervous as it's likely too good to be true (overfit). I know that I skipped some preprocessing steps just to see how these models worked, so let's go back and see if some `recipes` can bring my models back down to earth. 
 
 # Preprocessing With Recipes
 
@@ -204,9 +204,9 @@ summary(rec_obj)
 
 ```
 
-I tell the recipe not to use the "id" column in the analysis and we can see that it is classified as a "ID" and not "predictor". I run summary on the recipe object and can see the type of role the variables have, as well as the type. I saw 'nominal' for the factor variables (species, country, variety) and got spooked a little, as I thought nominal == numeric. Of course, it does not. Nominal is yet another term to describe a factor/string/non-numeric. 
+I tell the recipe not to use the "id" column in the analysis and we can see that it is classified as a "ID" and not "predictor". I run summary on the recipe object and can see the type of role the variables have, as well as the type. It is important to note that 'nominal' is yet another term to describe a factor/string/non-numeric. 
 
-Then I use the step_* functions to normalize the data (centers and scales numerical features) and create dummy variables for all of my nominal (non-numeric) features. 
+Then I use the step_* functions to normalize the data (it centers and scales numerical features) and to create dummy variables for all of my nominal (non-numeric) features. 
 
 So we built our recipe. Next step is to prep and juice. I'm getting thirsty.  
 
@@ -248,23 +248,23 @@ tidy(lm_fit1) %>%
 ```
 
 
-```{r}
+```{r lm predicted}
 lm_predicted <- augment(lm_fit1$fit, data = coff_train) 
 select(lm_predicted, id, cupper_points, .fitted:.std.resid)
 ```
 
-```{r}
+```{r plot lm residuals}
 ggplot(lm_predicted, aes(.fitted, cupper_points)) +
   geom_point(alpha = .2) +
   ggrepel::geom_label_repel(aes(label = id),
                             data = filter(lm_predicted, abs(.resid) > 2)) +
-  labs(title = "Actual vs. Predicted Cupper Points") +
+  labs(title = "Linear Model: Actual vs. Predicted Cupper Points") +
   geom_smooth()
 ```
 
 Whoa, what's up with coffee sample 963? We predicted a score of 7.4 or so, and the real score was a 5.25. This appears just to be a major outlier, so we can likely ignore. 
 
-```{r}
+```{r outlier analysis}
 
 filter(coffee, id == 963)
 
@@ -277,6 +277,17 @@ rf_fit1 <- fit(rf_spec, cupper_points ~ ., coff_train)
 rf_fit1$fit
 ```
 
+```{r}
+rf_predicted <- bind_cols(.fitted = rf_fit1$fit$predictions, data = coff_train)
+select(rf_predicted, id, cupper_points, .fitted)
+
+ggplot(rf_predicted, aes(.fitted, cupper_points)) +
+  geom_point(alpha = .2) +
+  # ggrepel::geom_label_repel(aes(label = id),
+  #                           data = filter(rf_predicted, abs(.resid) > 2)) +
+  labs(title = "Random Forest: Actual vs. Predicted Cupper Points") +
+  geom_smooth()
+```
 
 
 ```{r}
@@ -322,3 +333,10 @@ lm_fit1 %>%
 
 ```
 
+We see that the random forest and linear model are both very close together in performance. However, the random forest does have a small RMSE and higher R squared, which means it does a slightly better job explaining the variance and has less overall error in predicting the ratings. 
+
+# Next Steps 
+
+I did all of this analysis without knowing anything about tidymodels. Additionally, I am fairly new to using R for predicting values as well. It would be interesting to see how these models perform with cross-validation, optimized parameters and better feature selection. 
+
+The concept of a "recipe" which you can modify and reuse is incredibly interesting in this context. I have a lot more to learn here, and would direct readers to the great YouTube videos made by [Julia Silge](https://www.youtube.com/channel/UCTTBgWyJl2HrrhQOOc710kA). 

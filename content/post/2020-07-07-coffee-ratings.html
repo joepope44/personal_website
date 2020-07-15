@@ -15,8 +15,8 @@ slug: coffee-ratings
 <div id="intro" class="section level1">
 <h1>Intro</h1>
 <p>Today I am going to explore Coffee Ratings for this week’s Tidy Tuesday challenge. The data comes from the <a href="https://github.com/jldbc/coffee-quality-database">Coffee Quality Database</a>. The great thing about Tidy Tuesday is that we can do whatever we want with the data. There are no rules or directions!</p>
-<p>This data is very interesting and looks ripe for a predictive model. I can use the ratings provided to predict either a quantitative method, like what the ‘total_cup_score’ (Overall rating) is, or a qualitative measure, like what species of bean (Arabica or Robusta) or the country of origin.</p>
-<p>Predicting scores strikes me as a classic regression problem, best tackled by linear models or random forests, and classification could be solved with logistic regression, Naive Bayes, SVM or even neural networks. I’ve NEVER used <code>tidymodels</code> before, so let’s give it a go and see what we can learn.</p>
+<p>This data is very interesting with many features and looks ripe for a predictive model. I can use the various ratings provided to predict either a quantitative method, like what the ‘total_cup_score’ (Overall rating) is, or a qualitative measure, like what species of bean (Arabica or Robusta) or perhaps the country of origin.</p>
+<p>Predicting scores strikes me as a classic regression problem, best tackled by linear models or random forests, and classification could be solved with logistic regression, Naive Bayes, SVM or even neural networks. I’ve NEVER used <code>tidymodels</code> before, so let’s give it a go, make some mistakes, and see what we can learn.</p>
 <p>But first, some brief background of our data from the TidyTuesday repo:</p>
 <blockquote>
 <p>There is data for both Arabica and Robusta beans, across many countries and professionally rated on a 0-100 scale. All sorts of scoring/ratings for things like acidity, sweetness, fragrance, balance, etc - may be useful for either separating into visualizations/categories or for modeling/recommenders.</p>
@@ -30,22 +30,22 @@ slug: coffee-ratings
 <p>Setup</p>
 <pre class="r"><code>library(tidytuesdayR)
 library(tidyverse)</code></pre>
-<pre><code>## ── Attaching packages ─────────────────────── tidyverse 1.3.0 ──</code></pre>
+<pre><code>## ── Attaching packages ──────────────────────── tidyverse 1.3.0 ──</code></pre>
 <pre><code>## ✓ ggplot2 3.3.2     ✓ purrr   0.3.4
 ## ✓ tibble  3.0.1     ✓ dplyr   1.0.0
 ## ✓ tidyr   1.1.0     ✓ stringr 1.4.0
 ## ✓ readr   1.3.1     ✓ forcats 0.5.0</code></pre>
-<pre><code>## ── Conflicts ────────────────────────── tidyverse_conflicts() ──
+<pre><code>## ── Conflicts ─────────────────────────── tidyverse_conflicts() ──
 ## x dplyr::filter() masks stats::filter()
 ## x dplyr::lag()    masks stats::lag()</code></pre>
 <pre class="r"><code>library(tidymodels)</code></pre>
-<pre><code>## ── Attaching packages ────────────────────── tidymodels 0.1.0 ──</code></pre>
+<pre><code>## ── Attaching packages ─────────────────────── tidymodels 0.1.0 ──</code></pre>
 <pre><code>## ✓ broom     0.5.6      ✓ rsample   0.0.6 
 ## ✓ dials     0.0.6      ✓ tune      0.1.0 
 ## ✓ infer     0.5.1      ✓ workflows 0.1.1 
 ## ✓ parsnip   0.1.1      ✓ yardstick 0.0.6 
 ## ✓ recipes   0.1.12</code></pre>
-<pre><code>## ── Conflicts ───────────────────────── tidymodels_conflicts() ──
+<pre><code>## ── Conflicts ────────────────────────── tidymodels_conflicts() ──
 ## x scales::discard() masks purrr::discard()
 ## x dplyr::filter()   masks stats::filter()
 ## x recipes::fixed()  masks stringr::fixed()
@@ -1529,13 +1529,12 @@ altitude_mean_meters
 </div>
 <div id="check-initial-assumptions" class="section level1">
 <h1>Check Initial Assumptions</h1>
-<p>I originally wanted to predict “total_cup_points”. However, after some review it appears that this field is simply the sum of ten other ratings, from aroma to cupper_points. What I really want to predict is Cupper Points. This is the reviewer’s (aka the Cupper’s) final overall rating for the cup of joe. I can use this as dependant variable in a regression analysis. This should help me identify which features (aroma, acidity, elevation, country of origin?) influence the final rating the most.</p>
+<p>I originally wanted to predict “total_cup_points”. However, after some review it appears that this field is simply the sum of ten other ratings, from aroma to cupper_points. What I really want to predict is Cupper Points. This is the reviewer’s (aka the Cupper’s) personal overall rating for the cup of joe. I can use this as dependant variable in a regression analysis. This should help me identify which features (aroma, acidity, elevation, country of origin?) influence the final rating the most.</p>
 </div>
 <div id="potential-features" class="section level1">
 <h1>Potential Features</h1>
-<p>Before we dig further into the data, let’s speculate what might factors go into a superior coffee bean. If coffee is like wine, then perhaps region (lat, long, altitude, preciptation, average hours of sunlight, etc) makes a big difference. Perhaps certain companies utilize best practices and farming techniques. Maybe certain processing methods are better than others. We are given the testing date and the expiration date, so we can add a feature that measures how fresh the beans are. These features and more could be really importnat or totally useless. I have no idea! Let’s see what the data has to say about it.</p>
+<p>Before we dig further into the data, let’s speculate what might factors go into a superior coffee bean. If coffee is like wine, then perhaps region (lat, long, altitude, preciptation, average hours of sunlight, etc) makes a big difference. Perhaps certain companies utilize best practices and farming techniques. Maybe certain processing methods are better than others. We are given the testing date and the expiration date, so we can add a feature that measures how fresh the beans are. These features and more could be really important or totally useless. I have no idea! Let’s see what the data has to say about it.</p>
 <p>The wiki in the readme suggests that coffee beans are split 60/40 worldwide, by Arabica and Robusta. However, for this analysis the split is much more imbalanced. I thought it would be very interesting to build an Arabica vs. Robusta classifier but with such an imbalanced set I don’t think upsampling or other methods will be enough to build a robust model.</p>
-<p>OR WILL IT????</p>
 <pre class="r"><code>table(coffee_ratings$species)</code></pre>
 <pre><code>## 
 ## Arabica Robusta 
@@ -1587,8 +1586,10 @@ altitude_mean_meters
 <div id="tidymodels" class="section level1">
 <h1>TIDYMODELS</h1>
 <p>I have never used tidymodels, so let’s see how this goes. Let’s try to tackle the regression model first. From the skim package, we know we have no missing values or junky data for this. Nice!</p>
-<p>First thing to do is narrow our data and make it ripe for modeling. TidyTuesday mentions that Yorgos Askalidis already determined that altitude, processing_method and color have no bearing to the cupping score, and I think that makes sense. I will omit those features for now. That leaves us with species, country of origin and several ratings and measurements of the coffee samples. I am going to take the top ten countries only (out of 36 in the data) and lump the rest into “Other” with forcats.</p>
-<p>I went back after trying the models a few times and removed ‘species’. In this smaller, filtered dataset there are only 3 records with Robusta coffee beans. It caused me some issues, and with only 3 members of the minority class, I decided to just remove it completely.</p>
+<p>First thing to do is narrow our data and make it ripe for modeling. TidyTuesday mentions that Yorgos Askalidis already determined that altitude, processing_method and color have no bearing to the cupping score, and I think that makes sense. I will omit those features for now. That leaves us with species, country of origin and several ratings and measurements of the coffee samples. I am going to take the top ten countries only (out of 36 in the data) and lump the rest into “Other” with forcats. This is simply to speed up the processing without losing too much information gain for the feature.</p>
+<blockquote>
+<p>Note - I went back after trying the models a few times and removed ‘species’. In this smaller, filtered dataset there are only 3 records with Robusta coffee beans. It caused me some issues, and with only 3 members of the minority class, I decided to just remove it completely.</p>
+</blockquote>
 <pre class="r"><code>coffee &lt;- coffee_ratings %&gt;%
   mutate(id = row_number()) %&gt;% # add ID field, convert NA to Other
   select(id, country_of_origin, variety, aroma:moisture) %&gt;% # select features
@@ -1600,7 +1601,9 @@ altitude_mean_meters
   filter(cupper_points != 0) %&gt;% # remove 0 point scores as junk data
   drop_na() # drop NA for country and variety fields. only affects 200 records</code></pre>
 <p>Split the data</p>
-<p>I am stratifying by species, even though there aren’t many Robusta coffee samples in the data. This at least places the same ratio in train and test data sets.</p>
+<blockquote>
+<p>Note - I initially tried to stratify by species, even though there aren’t many Robusta coffee samples in the data. I ended up removing this due to the severe class imbalance. It may have been worth the effort to upsample Robusta and then stratify by species.</p>
+</blockquote>
 <pre class="r"><code>set.seed(1234)
 
 coffee_split &lt;- coffee %&gt;% 
@@ -1608,7 +1611,7 @@ coffee_split &lt;- coffee %&gt;%
 
 coffee_train &lt;- training(coffee_split)
 coffee_test &lt;- testing(coffee_split)</code></pre>
-<p>Naive model with no scaling or pre-processing</p>
+<p>Naive linear model with no scaling or pre-processing</p>
 <pre class="r"><code>lm_spec &lt;- linear_reg() %&gt;%
   set_engine(engine = &quot;lm&quot;)
 
@@ -1627,7 +1630,7 @@ lm_fit &lt;- lm_spec %&gt;%
 lm_fit</code></pre>
 <pre><code>## parsnip model object
 ## 
-## Fit time:  16ms 
+## Fit time:  10ms 
 ## 
 ## Call:
 ## stats::lm(formula = formula, data = data)
@@ -1751,7 +1754,7 @@ rf_fit &lt;- rf_spec %&gt;%
 rf_fit</code></pre>
 <pre><code>## parsnip model object
 ## 
-## Fit time:  516ms 
+## Fit time:  461ms 
 ## Ranger result
 ## 
 ## Call:
@@ -1767,7 +1770,7 @@ rf_fit</code></pre>
 ## Splitrule:                        variance 
 ## OOB prediction error (MSE):       0.04135314 
 ## R squared (OOB):                  0.7374583</code></pre>
-<p>Both models produce a hefty R squared, &gt; .7! This makes me nervous as it’s likely too good to be true. I know that I skipped some preprocessing steps just to see how these models worked, so let’s go back and see if some <code>recipes</code> can bring my model back down to earth.</p>
+<p>Both models produce a hefty R squared, &gt; .7! This makes me nervous as it’s likely too good to be true (overfit). I know that I skipped some preprocessing steps just to see how these models worked, so let’s go back and see if some <code>recipes</code> can bring my models back down to earth.</p>
 </div>
 <div id="preprocessing-with-recipes" class="section level1">
 <h1>Preprocessing With Recipes</h1>
@@ -1797,9 +1800,9 @@ summary(rec_obj)</code></pre>
 ## 12 sweetness         numeric predictor original
 ## 13 moisture          numeric predictor original
 ## 14 cupper_points     numeric outcome   original</code></pre>
-<p>I tell the recipe not to use the “id” column in the analysis. I run summary on the recipe object and can see the type of role the variables have, as well as the type. I saw ‘nominal’ for the factor variables (species, country, variety) and got spooked a little, as I thought nominal == numeric. Of course, it does not. Nominal is yet another term to describe a factor/string/non-numeric.</p>
-<p>Then I use the step_* functions to normalize the data (centers and scales numerical features) and create dummy variables for all of my nominal (non-numeric) features.</p>
-<p>So we built our recipe. Next step is to prep and juice. I’m getting hungry.</p>
+<p>I tell the recipe not to use the “id” column in the analysis and we can see that it is classified as a “ID” and not “predictor”. I run summary on the recipe object and can see the type of role the variables have, as well as the type. It is important to note that ‘nominal’ is yet another term to describe a factor/string/non-numeric.</p>
+<p>Then I use the step_* functions to normalize the data (it centers and scales numerical features) and to create dummy variables for all of my nominal (non-numeric) features.</p>
+<p>So we built our recipe. Next step is to prep and juice. I’m getting thirsty.</p>
 <pre class="r"><code>coff_train &lt;- juice(prep(rec_obj))
 
 dim(coff_train)</code></pre>
@@ -1940,9 +1943,9 @@ select(lm_predicted, id, cupper_points, .fitted:.std.resid)</code></pre>
   geom_point(alpha = .2) +
   ggrepel::geom_label_repel(aes(label = id),
                             data = filter(lm_predicted, abs(.resid) &gt; 2)) +
-  labs(title = &quot;Actual vs. Predicted Cupper Points&quot;) +
+  labs(title = &quot;Linear Model: Actual vs. Predicted Cupper Points&quot;) +
   geom_smooth()</code></pre>
-<p><img src="//post/2020-07-07-coffee-ratings_files/figure-html/unnamed-chunk-7-1.png" width="1440" /></p>
+<p><img src="//post/2020-07-07-coffee-ratings_files/figure-html/plot%20lm%20residuals-1.png" width="1440" /></p>
 <p>Whoa, what’s up with coffee sample 963? We predicted a score of 7.4 or so, and the real score was a 5.25. This appears just to be a major outlier, so we can likely ignore.</p>
 <pre class="r"><code>filter(coffee, id == 963)</code></pre>
 <pre><code>## # A tibble: 1 x 14
@@ -1969,6 +1972,29 @@ rf_fit1$fit</code></pre>
 ## Splitrule:                        variance 
 ## OOB prediction error (MSE):       0.04222097 
 ## R squared (OOB):                  0.7319486</code></pre>
+<pre class="r"><code>rf_predicted &lt;- bind_cols(.fitted = rf_fit1$fit$predictions, data = coff_train)
+select(rf_predicted, id, cupper_points, .fitted)</code></pre>
+<pre><code>## # A tibble: 834 x 3
+##       id cupper_points .fitted
+##    &lt;int&gt;         &lt;dbl&gt;   &lt;dbl&gt;
+##  1     2          8.58    8.60
+##  2     3          9.25    8.31
+##  3     5          8.58    8.54
+##  4    10          8.5     8.41
+##  5    12          8.5     8.30
+##  6    13          8.33    8.36
+##  7    16          8.17    8.33
+##  8    19          8.42    8.24
+##  9    21          8.17    8.29
+## 10    23          8.58    8.14
+## # … with 824 more rows</code></pre>
+<pre class="r"><code>ggplot(rf_predicted, aes(.fitted, cupper_points)) +
+  geom_point(alpha = .2) +
+  # ggrepel::geom_label_repel(aes(label = id),
+  #                           data = filter(rf_predicted, abs(.resid) &gt; 2)) +
+  labs(title = &quot;Random Forest: Actual vs. Predicted Cupper Points&quot;) +
+  geom_smooth()</code></pre>
+<p><img src="//post/2020-07-07-coffee-ratings_files/figure-html/unnamed-chunk-1-1.png" width="1440" /></p>
 <pre class="r"><code>results_train &lt;- lm_fit1 %&gt;%
   predict(new_data = coff_train) %&gt;%
   mutate(
@@ -2014,4 +2040,10 @@ bind_rows(rf_fit1 %&gt;%
 ## 4 rmse    standard       0.231 rf   
 ## 5 rsq     standard       0.664 rf   
 ## 6 mae     standard       0.130 rf</code></pre>
+<p>We see that the random forest and linear model are both very close together in performance. However, the random forest does have a small RMSE and higher R squared, which means it does a slightly better job explaining the variance and has less overall error in predicting the ratings.</p>
+</div>
+<div id="next-steps" class="section level1">
+<h1>Next Steps</h1>
+<p>I did all of this analysis without knowing anything about tidymodels. Additionally, I am fairly new to using R for predicting values as well. It would be interesting to see how these models perform with cross-validation, optimized parameters and better feature selection.</p>
+<p>The concept of a “recipe” which you can modify and reuse is incredibly interesting in this context. I have a lot more to learn here, and would direct readers to the great YouTube videos made by <a href="https://www.youtube.com/channel/UCTTBgWyJl2HrrhQOOc710kA">Julia Silge</a>.</p>
 </div>

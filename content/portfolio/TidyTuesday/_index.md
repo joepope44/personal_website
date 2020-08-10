@@ -16,5 +16,5 @@ work:
 - machine learning
 ---
 
-[Click to Image Gallery](README.md)
+<!--[Click to Image Gallery](/portfolio/TidyTuesday/README.md)-->
 

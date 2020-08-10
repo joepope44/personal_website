@@ -49,7 +49,7 @@ Supplmental graphic showing average annual sunlight for the EU
 
 *** 
 
-[More Projects -- cont'd](README2.md)
+[More Projects -- cont'd](portfolio/TidyTuesday/README2.md)
 
 
 

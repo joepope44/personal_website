@@ -7,8 +7,8 @@ title: HOME
 
 Hey,
 
-I'm Joseph Pope, a Web Developer and Entrepreneur. This file is in content/_index.md.
+I'm Joseph Pope, a Data Scientist focusing on visualizations and story-telling. 
 
-Lorem ipsum dolor sit amet, consectetur adipisicing elit. Delectus error cumque quisquam necessitatibus libero dolore porro, quo at molestiae modi voluptatibus iusto alias corporis. Accusamus, debitis, atque. Maiores, distinctio, neque.
+Most of my career has been spent in media and business analytical roles. I enjoy solving problems and colloborating with smart, driven people. This website is a public facing blog showcasing my improvement at coding, data analysis, machine learning, statistics and a variety of other subjects. 
 
 [Get to know me better](/about "Get to know me better")

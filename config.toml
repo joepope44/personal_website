@@ -30,6 +30,8 @@ ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$"]
   breadcrumb = true
   accentColor = "#FD3519"
   mainSections = ['portfolio'] # values: ['post', 'portfolio'] only accept one section, to be displayed bellow 404
+  pygmentsCodeFences = true
+  pygmentsStyle = "tango"
 
 [params.notFound]
   gopher = "/images/gopher.png" # checkout https://gopherize.me/
@@ -85,13 +87,6 @@ ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$"]
   url = "/post/"
   weight = -100
   
-[[menu.main]]
-  identifier = "external link test"
-  name = "Link"
-  title = "Link section"
-  url = "https://www.cnn.com"
-  weight = -90
-
 [sitemap]
   changefreq = "monthly"
   filename = "sitemap.xml"

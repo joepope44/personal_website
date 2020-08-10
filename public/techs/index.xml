@@ -13,20 +13,29 @@
     
     
     <item>
-      <title>D3</title>
-      <link>/techs/d3/</link>
+      <title>ggplot</title>
+      <link>/techs/ggplot/</link>
       <pubDate>Thu, 02 May 2019 19:47:09 +0200</pubDate>
       
-      <guid>/techs/d3/</guid>
+      <guid>/techs/ggplot/</guid>
       <description></description>
     </item>
     
     <item>
-      <title>javascript</title>
-      <link>/techs/javascript/</link>
+      <title>R</title>
+      <link>/techs/r/</link>
       <pubDate>Thu, 02 May 2019 19:47:09 +0200</pubDate>
       
-      <guid>/techs/javascript/</guid>
+      <guid>/techs/r/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>tidyverse</title>
+      <link>/techs/tidyverse/</link>
+      <pubDate>Thu, 02 May 2019 19:47:09 +0200</pubDate>
+      
+      <guid>/techs/tidyverse/</guid>
       <description></description>
     </item>
     
